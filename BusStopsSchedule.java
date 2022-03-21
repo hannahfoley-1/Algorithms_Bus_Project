@@ -1,13 +1,10 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class BusStopsSchedule {
     public static Map<Time, ArrayList<BusStop>> arrivalTimeList;
-    public static Map<Time, ArrayList<BusStop>> departureTimeList;
+    //public static Map<Time, ArrayList<BusStop>> departureTimeList;
     public static BusStopsList busStopsList;
     boolean valid = true;
 
@@ -17,39 +14,84 @@ public class BusStopsSchedule {
             valid = false;
         }
 
+        arrivalTimeList = new HashMap<>();
+        //departureTimeList = new HashMap<>();
+        this.busStopsList = busStopsList;
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
             String line = reader.readLine();
+            line = reader.readLine();
 
+            int count = 0;
             while(line != null)
             {
+                System.out.println(count++);
                 Scanner scanner = new Scanner(line);
                 scanner.useDelimiter(",");
                 scanner.next();
                 String arrival_time = scanner.next();
-                Scanner scanner2 = new Scanner(arrival_time);
-                scanner2.useDelimiter(":");
-                int hours = scanner2.nextInt();
-                int minutes = scanner2.nextInt();
-                int seconds = scanner2.nextInt();
+                arrival_time = arrival_time.substring(1);
+                //this line makes sure that we skip the space after the comman, otherwise the next line wont work
+                String[] time = arrival_time.split(":");
+                int hours = Integer.parseInt(time[0]);
+                int minutes = Integer.parseInt(time[1]);
+                int seconds = Integer.parseInt(time[2]);
+                if(hours > 23 || minutes > 59 || seconds > 59 || hours < 0 || minutes < 0 || seconds < 0)
+                {
+                    continue;
+                }
                 Time arrival = new Time(hours, minutes, seconds);
                 String departure_time = scanner.next();
-                scanner2 = new Scanner(departure_time);
-                scanner2.useDelimiter(":");
-                hours = scanner2.nextInt();
-                minutes = scanner2.nextInt();
-                seconds = scanner2.nextInt();
+                departure_time = departure_time.substring(1);
+                String [] time2 = departure_time.split(":");
+                hours = Integer.parseInt(time2[0]);
+                minutes = Integer.parseInt(time2[1]);
+                seconds = Integer.parseInt(time2[2]);
+                if(hours > 23 || minutes > 59 || seconds > 59 || hours < 0 || minutes < 0 || seconds < 0)
+                {
+                    continue;
+                }
                 Time departure = new Time(hours, minutes, seconds);
                 int stop_id = scanner.nextInt();
                 BusStop currentStop = busStopsList.getBusStopByID(stop_id);
-                ArrayList<BusStop> bussesArrivingAt = arrivalTimeList.get(arrival);
-                bussesArrivingAt.add(currentStop);
-                arrivalTimeList.put(arrival, bussesArrivingAt);
-                ArrayList<BusStop> bussesDepartingAt = departureTimeList.get(departure);
-                bussesDepartingAt.add(currentStop);
-                departureTimeList.put(departure, bussesDepartingAt);
+                if(arrivalTimeList == null || arrivalTimeList.isEmpty())
+                {
+                    ArrayList<BusStop> bussesArrivingAt = new ArrayList<>();
+                    bussesArrivingAt.add(currentStop);
+                    arrivalTimeList.put(arrival, bussesArrivingAt);
+                }
+                else
+                {
+                    ArrayList<BusStop> bussesArrivingAt = arrivalTimeList.get(arrival);
+                    if(bussesArrivingAt == null)
+                    {
+                        bussesArrivingAt = new ArrayList<BusStop>();
+                    }
+                    bussesArrivingAt.add(currentStop);
+                    arrivalTimeList.put(arrival, bussesArrivingAt);
+                }
+                /*
+                if (departureTimeList == null || departureTimeList.isEmpty())
+                {
+                    ArrayList<BusStop> bussesDepartingAt = new ArrayList<>();
+                    bussesDepartingAt.add(currentStop);
+                    departureTimeList.put(departure, bussesDepartingAt);
+                }
+                else
+                {
+                    ArrayList<BusStop> bussesDepartingAt = departureTimeList.get(arrival);
+                    if(bussesDepartingAt == null)
+                    {
+                        bussesDepartingAt = new ArrayList<BusStop>();
+                    }
+                    bussesDepartingAt.add(currentStop);
+                    departureTimeList.put(arrival, bussesDepartingAt);
+
+                }
+
+                 */
                 scanner.close();
-                scanner2.close();
                 line = reader.readLine();
 
             }

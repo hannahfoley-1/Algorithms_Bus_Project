@@ -1,3 +1,7 @@
+import java.util.Comparator;
+
+import static java.lang.Math.min;
+
 public class BusStop {
     int stop_id;
     double stop_lat;
@@ -60,3 +64,4 @@ public class BusStop {
     }
 
 }
+

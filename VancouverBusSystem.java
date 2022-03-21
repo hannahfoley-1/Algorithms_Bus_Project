@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.net.SecureCacheResponse;
 import java.util.Scanner;
 
 public class VancouverBusSystem {
@@ -11,7 +12,7 @@ public class VancouverBusSystem {
         {
             try {
                 allBusStops = new BusStopsList("stops.txt");
-                transfersGraph = new Graph("transfers.txt");
+                transfersGraph = new Graph("transfers.txt", allBusStops);
                 schedule = new BusStopsSchedule("stop_times.txt", allBusStops);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -79,13 +80,19 @@ public class VancouverBusSystem {
 
     public static void arrival_time_option()
     {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanny = new Scanner(System.in);
         String input;
         System.out.print("Enter arrival time in hh:mm:ss ");
+        input = scanny.next();
+        Scanner scanner = new Scanner(input);
         scanner.useDelimiter(":");
         int hours = scanner.nextInt();
         int minutes = scanner.nextInt();
-        int seconds = scanner.nextInt();
+        int seconds = 0;
+        if(scanner.hasNextInt())
+        {
+            seconds = scanner.nextInt();
+        }
         Time time = new Time(hours, minutes, seconds);
         schedule.tellMeAboutBussesArrivingAt(time);
     }
