@@ -133,6 +133,22 @@ public class VancouverBusSystem {
     {
         Scanner scanner = new Scanner(System.in);
         String input;
+        String name = "bus stop";
+        TST tst = new TST(graph.allBusStops);
+        Iterable<String> stopsWithPrefix = tst.keysWithPrefix(name);
+
+        if(stopsWithPrefix != null)
+        {
+            for(String i : stopsWithPrefix)
+            {
+                System.out.println(tst.get(i).tellMeAboutThisBusStop());
+            }
+        }
+        else
+        {
+            System.out.println("No matches for this stop ");
+        }
+
     }
 
     public static void arrival_time_option()

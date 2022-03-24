@@ -7,8 +7,11 @@ public class EdgeWeightedGraph {
     public int noVertices;
     Time timeClass = new Time(0, 0, 0);
     public ArrayList<BusStop> allBusStops;
+    //array list of all the trips, trips are equivalent to bus routes
     public ArrayList<Trip> allTrips;
+    //array list of all journeys, journeys are any distance travelled between 2 stops
     public ArrayList<EdgeJourney> allJourneys;
+    //this adjacency list represents the stop number, and all the accessible journeys from that stop number
     HashMap<Integer, ArrayList<EdgeJourney>> adjacencyList;
 
     public EdgeWeightedGraph(String stopsfile, String stopsTimesFile, String transfersFile)
@@ -237,4 +240,6 @@ public class EdgeWeightedGraph {
         }
         return -1;
     }
+
+
 }
