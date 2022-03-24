@@ -87,7 +87,7 @@ public class BusStopsList {
 
         //for(int k = lo; k <= high; k++)
         //{
-          //  copy[k] = a[k];
+        //  copy[k] = a[k];
         //}
 
         int i = lo;
@@ -166,3 +166,4 @@ public class BusStopsList {
     }
 
 }
+

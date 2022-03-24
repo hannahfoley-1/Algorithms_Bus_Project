@@ -60,7 +60,7 @@ public class BusStop {
     public void tellMeAboutThisBusStop()
     {
         System.out.print("Stop name : " + stop_name + '\n' + "Stop id : " + stop_id + '\n' + "Stop co-orddinates : ("
-                + stop_lat + ", " + stop_lon + '\n');
+                + stop_lat + ", " + stop_lon + ")" + '\n');
     }
 
 }

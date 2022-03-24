@@ -194,7 +194,21 @@ public class EdgeWeightedGraph {
         return 0;
     }
 
-    public int directTripStopsBetween(int start_id, int end_id)
+    public ArrayList<Integer> directTripStopsBetweenArray(int start_id, int end_id)
+    {
+        for(int i = 0; i < allTrips.size(); i++)
+        {
+            Trip currentTrip = allTrips.get(i);
+            ArrayList<Integer> stopsOnThisRoute = currentTrip.stop_sequence;
+            if(stopsOnThisRoute.contains(start_id) && stopsOnThisRoute.contains(end_id))
+            {
+                return stopsOnThisRoute;
+            }
+        }
+        return null;
+    }
+
+    public int numberOfStopsBetweenDirect(int start_id, int end_id)
     {
         for(int i = 0; i < allTrips.size(); i++)
         {
@@ -204,11 +218,13 @@ public class EdgeWeightedGraph {
             {
                 int index1 = stopsOnThisRoute.indexOf(start_id);
                 int index2 = stopsOnThisRoute.indexOf(end_id);
-                return index1 = index2;
+                return end_id - start_id;
             }
         }
-        return 0;
+        return -1;
     }
+
+
 
     public int findStopIndex(int stop_id)
     {

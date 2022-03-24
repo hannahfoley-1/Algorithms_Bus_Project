@@ -19,4 +19,21 @@ public class Trip {
 
     }
 
+    int getStopForArrivalTime(Time time)
+    {
+        boolean contains = arrival_times.contains(time);
+        if(contains)
+        {
+            int index = arrival_times.indexOf(time);
+            return stop_sequence.get(index);
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+
+
+
 }

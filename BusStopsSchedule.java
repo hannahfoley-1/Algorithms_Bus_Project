@@ -4,19 +4,19 @@ import java.util.*;
 
 public class BusStopsSchedule {
     public static Map<Time, ArrayList<BusStop>> arrivalTimeList;
-    //public static Map<Time, ArrayList<BusStop>> departureTimeList;
+    public static Map<Time, ArrayList<BusStop>> departureTimeList;
+    public static HashMap<Integer, ArrayList<Integer>> stopsOnTrip = new HashMap<>();
     public static BusStopsList busStopsList;
     boolean valid = true;
 
-    BusStopsSchedule(String filename, BusStopsList busStopsList){
-        this.busStopsList = busStopsList;
+    BusStopsSchedule(String filename, BusStopsList list){
+        this.busStopsList = list;
         if (filename == null || filename == "") {
             valid = false;
         }
 
         arrivalTimeList = new HashMap<>();
         //departureTimeList = new HashMap<>();
-        this.busStopsList = busStopsList;
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -29,7 +29,7 @@ public class BusStopsSchedule {
                 System.out.println(count++);
                 Scanner scanner = new Scanner(line);
                 scanner.useDelimiter(",");
-                scanner.next();
+                int trip_id = scanner.nextInt();
                 String arrival_time = scanner.next();
                 arrival_time = arrival_time.substring(1);
                 //this line makes sure that we skip the space after the comman, otherwise the next line wont work
@@ -54,6 +54,22 @@ public class BusStopsSchedule {
                 }
                 Time departure = new Time(hours, minutes, seconds);
                 int stop_id = scanner.nextInt();
+                if(stopsOnTrip == null || stopsOnTrip.isEmpty())
+                {
+                    ArrayList<Integer> bussesOnRoute = new ArrayList<>();
+                    bussesOnRoute.add(stop_id);
+                    stopsOnTrip.put(trip_id, bussesOnRoute);
+                }
+                else
+                {
+                    ArrayList<Integer> bussesOnRoute = stopsOnTrip.get(trip_id);
+                    if(bussesOnRoute == null)
+                    {
+                        bussesOnRoute = new ArrayList<>();
+                    }
+                    bussesOnRoute.add(stop_id);
+                    stopsOnTrip.put(trip_id, bussesOnRoute);
+                }
                 BusStop currentStop = busStopsList.getBusStopByID(stop_id);
                 if(arrivalTimeList == null || arrivalTimeList.isEmpty())
                 {
@@ -122,3 +138,4 @@ public class BusStopsSchedule {
     }
 
 }
+
