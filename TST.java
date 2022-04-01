@@ -81,7 +81,7 @@ public class TST<T> {
         //searchResults.add(root.value);
         //findChildVals(root.middle);
         if (x.value != null) possibleValues.add((x.value));
-        //findChildVals(x.middle);
+        findChildVals(x);
 
         return possibleValues;
         //return searchResults;

@@ -169,8 +169,21 @@ public class EdgeWeightedGraph {
                     } else {
                         journeys = adjacencyList.get(stop_id1);
                     }
-                    journeys.add(edge);
-                    adjacencyList.put(stop_id1, journeys);
+                    //check if the edge already exists at this point in the adjacency list
+                    boolean exists = false;
+                    for(int i = 0; i < journeys.size(); i++)
+                    {
+                        EdgeJourney thisEdge = journeys.get(i);
+                        if(thisEdge.to_stop_id == edge.to_stop_id && thisEdge.from_stop_id == edge.from_stop_id)
+                        {
+                            exists = true;
+                        }
+                    }
+                    if(!exists)
+                    {
+                        journeys.add(edge);
+                        adjacencyList.put(stop_id1, journeys);
+                    }
                 }
                 stop_id1 = stop_id2;
                 line = reader.readLine();
@@ -285,10 +298,13 @@ public class EdgeWeightedGraph {
 
                 int first = start;
                 int last = end;
-                while (first != last && allBusStops.get(last) != null && last != end) {
+                while (allBusStops.get(last) != null) {
+                    //first != last &&
+                    //&& last != end
                     System.out.println(last + " (" + allBusStops.get(last).stop_name + ")");
                     last = proceedingStop.get(last);
                 }
+                System.out.println("->");
                 System.out.println("The cost of this trip is " + distance.get(end));
 
             }
