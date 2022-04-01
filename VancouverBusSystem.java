@@ -2,10 +2,11 @@ import java.io.IOException;
 import java.net.SecureCacheResponse;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class VancouverBusSystem {
-   // public static BusStopsList allBusStops;
+    // public static BusStopsList allBusStops;
     //public static Graph transfersGraph;
     public static EdgeWeightedGraph graph;
     //public static BusStopsSchedule schedule;
@@ -16,7 +17,7 @@ public class VancouverBusSystem {
             System.out.println("Begin");
             try {
                 //transfersGraph = new Graph("transfers.txt", "stops.txt", "stop_times.txt");
-                graph = new EdgeWeightedGraph("stops.txt", "stop_times.txt", "transfers.txt");
+                graph = new EdgeWeightedGraph("stops.txt", "stop_times_small.txt", "transfers.txt");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -55,8 +56,6 @@ public class VancouverBusSystem {
                 arrival_time_option();
             }
 
-
-
         }
     }
 
@@ -88,6 +87,9 @@ public class VancouverBusSystem {
             System.out.println("Please enter bus stop ID number ");
         }
 
+        graph.ShortestPath(start_id, destination_id);
+
+        /*
         //check if a direct route is possible using directTrip() function in edge weidghted grpah class
         boolean direct = graph.directTrip(start_id, destination_id);
 
@@ -126,17 +128,21 @@ public class VancouverBusSystem {
         //BusStop destination = allBusStops.getBusStopByID(destination_id);
 
         //TODO: Shortest path between these two stops
-
+*/
     }
 
     public static void information_option()
     {
         Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the name of the bus stop or the first few letters ");
         String input;
-        String name = "bus stop";
-        TST tst = new TST(graph.allBusStops);
-        Iterable<String> stopsWithPrefix = tst.keysWithPrefix(name);
+        input = scanner.nextLine();
+        input = input.toUpperCase(Locale.ROOT);
+        TST tst = new TST(graph);
+        ArrayList<String> matches = tst.contains(input);
+        tst.printPossibleValues();
 
+        /*
         if(stopsWithPrefix != null)
         {
             for(String i : stopsWithPrefix)
@@ -148,6 +154,8 @@ public class VancouverBusSystem {
         {
             System.out.println("No matches for this stop ");
         }
+
+         */
 
     }
 
@@ -167,6 +175,8 @@ public class VancouverBusSystem {
             seconds = scanner.nextInt();
         }
         Time time = new Time(hours, minutes, seconds);
+        graph.getBussesArrivingAt(time);
+        /*
         ArrayList<Trip> allTrips = graph.allTrips;
         for(int i = 0; i < allTrips.size(); i++)
         {
@@ -177,6 +187,7 @@ public class VancouverBusSystem {
                 System.out.println("Stop number: " + busStop + ", Trip ID: " + currentTrip.trip_id);
             }
         }
+         */
         //schedule.tellMeAboutBussesArrivingAt(time);
     }
 
