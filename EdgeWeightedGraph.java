@@ -219,6 +219,34 @@ public class EdgeWeightedGraph {
                     transferWeight = minimumTransferTime / 100;
                 }
                 EdgeJourney edge = new EdgeJourney(arrival_stop_id, departure_stop_id, transfer_type, transferWeight);
+                //add this edge to the adjacency list
+                if (adjacencyList == null) {
+                    ArrayList<EdgeJourney> journeys = new ArrayList<>();
+                    journeys.add(edge);
+                    adjacencyList.put(arrival_stop_id, journeys);
+                } else {
+                    ArrayList<EdgeJourney> journeys;
+                    if (adjacencyList.get(arrival_stop_id) == null) {
+                        journeys = new ArrayList<>();
+                    } else {
+                        journeys = adjacencyList.get(arrival_stop_id);
+                    }
+                    //check if the edge already exists at this point in the adjacency list
+                    boolean exists = false;
+                    for(int i = 0; i < journeys.size(); i++)
+                    {
+                        EdgeJourney thisEdge = journeys.get(i);
+                        if(thisEdge.to_stop_id == edge.to_stop_id && thisEdge.from_stop_id == edge.from_stop_id)
+                        {
+                            exists = true;
+                        }
+                    }
+                    if(!exists)
+                    {
+                        journeys.add(edge);
+                        adjacencyList.put(arrival_stop_id, journeys);
+                    }
+                }
                 line = reader.readLine();
                 scanner.close();
             }
@@ -261,7 +289,10 @@ public class EdgeWeightedGraph {
             queue.add(edges.get(i));
         }
 
-        while (!queue.isEmpty()) {
+        boolean solved = false;
+        proceedingStop.put(start, start);
+
+        while (!queue.isEmpty() && !solved) {
             //take out the edge that has the smallest distance
             EdgeJourney currentEdge = queue.poll();
             from = currentEdge.from_stop_id;
@@ -283,7 +314,7 @@ public class EdgeWeightedGraph {
                     if (edges.get(i).to_stop_id != start && !visited.get(edges.get(i).to_stop_id)) {
                         //get length from start node to the node
                         double soFar = distance.get(from);
-                        soFar += edges.get(i).distance;
+                        soFar += edges.get(i).edgeWeight;
                         int transfer_type = edges.get(i).transfer_type;
                         EdgeJourney edgeForPQ = new EdgeJourney(start, edges.get(i).to_stop_id, transfer_type, soFar);
                         proceedingStop.put(edges.get(i).to_stop_id, edges.get(i).from_stop_id);
@@ -291,24 +322,68 @@ public class EdgeWeightedGraph {
                     }
                 }
             }
-            if (to == end) {
+            //if (to == end) {
+            if (visited.get(end)) {
+                solved = true;
                 System.out.println("The stops between stop #" + start + " (" + allBusStops.get(start).stop_name + ") " +
                         "and stop #" + end + " (" + allBusStops.get(end).stop_name + ") are: ");
                 //reverse proceeding stop list
-
-                int first = start;
-                int last = end;
-                while (allBusStops.get(last) != null) {
-                    //first != last &&
-                    //&& last != end
-                    System.out.println(last + " (" + allBusStops.get(last).stop_name + ")");
-                    last = proceedingStop.get(last);
+                if(proceedingStop.size() == 1)
+                {
+                    System.out.println("These are 1 stop apart");
+                    System.out.println("//////////////////////");
                 }
-                System.out.println("->");
-                System.out.println("The cost of this trip is " + distance.get(end));
+                else
+                {
+                    //print stops in correct order
+                    ArrayList<Integer> stopSequence = new ArrayList<>();
+                    int first = start;
+                    int last = end;
+                    while (allBusStops.get(last) != null && last != first) {
+                        stopSequence.add(allBusStops.get(last).stop_id);
+                        last = proceedingStop.get(last);
+                    }
+                    stopSequence.add(allBusStops.get(first).stop_id);
+                    for(int i = stopSequence.size()-1; i >= 0; i--)
+                    {
+                        if(i != stopSequence.size()-1)
+                        {
+                            System.out.println("->");
+                        }
+                        System.out.println(stopSequence.get(i) + " (" + allBusStops.get(stopSequence.get(i)).stop_name + ")");
 
+                    }
+                    /*
+                    int first = 0;
+                            //= start;
+                    //int last = end;
+                    int last = start;
+                    while (allBusStops.get(last) != null && last != first) {
+                        //first != last &&
+                        //&& last != end
+                        if(last != end)
+                        {
+                            System.out.println("->");
+                        }
+                        System.out.println(last + " (" + allBusStops.get(last).stop_name + ")");
+                        last = proceedingStop.get(last);
+                        if(last == first)
+                        {
+                            System.out.println("->");
+                            System.out.println(last + " (" + allBusStops.get(last).stop_name + ")");
+                        }
+                    }
+                     */
+                    System.out.println("The cost of this trip is " + distance.get(end));
+                    System.out.println("//////////////////////////////////////////////");
+
+                }
             }
 
+        }
+        if(!solved)
+        {
+            System.out.println("There doesn't seem to be a way to connect these two stops. Please try again.");
         }
 
         /*
@@ -357,5 +432,14 @@ public class EdgeWeightedGraph {
         {
             System.out.println("There are no buses arriving at this time. Maybe try and enter another time. ");
         }
+    }
+
+    boolean doesThisBusStopExist(int stop_id)
+    {
+        if(allBusStops.get(stop_id) != null)
+        {
+            return true;
+        }
+        return false;
     }
 }

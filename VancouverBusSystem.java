@@ -64,27 +64,49 @@ public class VancouverBusSystem {
         Scanner scanner = new Scanner(System.in);
         int start_id = 0;
         int destination_id = 0;
+        boolean validInput = false;
 
-        System.out.print("What bus stop are you travelling from? ");
-        if(scanner.hasNextInt())
+        while(!validInput)
         {
-            start_id = scanner.nextInt();
-        }
-        else
-        {
-            System.out.println("Please enter bus stop ID number ");
-        }
+            System.out.print("What bus stop are you travelling from? ");
+            if(scanner.hasNextInt())
+            {
+                start_id = scanner.nextInt();
+                if(graph.doesThisBusStopExist(start_id) == false)
+                {
+                    System.out.println("This bus stop ID does not exist... ");
+                    continue;
+                }
+                //else
+                //{
+                  //  validInput = true;
+                //}
+            }
+            else
+            {
+                System.out.println("Please enter bus stop ID number ");
+            }
 
-        //BusStop start = allBusStops.getBusStopByID(start_id);
+            //BusStop start = allBusStops.getBusStopByID(start_id);
 
-        System.out.print("What bus stop are you travelling to? ");
-        if(scanner.hasNextInt())
-        {
-            destination_id = scanner.nextInt();
-        }
-        else
-        {
-            System.out.println("Please enter bus stop ID number ");
+            System.out.print("What bus stop are you travelling to? ");
+            if(scanner.hasNextInt())
+            {
+                destination_id = scanner.nextInt();
+                if(graph.doesThisBusStopExist(destination_id) == false)
+                {
+                    System.out.println("This bus stop ID does not exist... ");
+                    continue;
+                }
+                else
+                {
+                    validInput = true;
+                }
+            }
+            else
+            {
+                System.out.println("Please enter bus stop ID number ");
+            }
         }
 
         graph.ShortestPath(start_id, destination_id);
