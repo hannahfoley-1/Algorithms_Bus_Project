@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class TST<T> {
+    private final String[] KEYWORDS = { "FLAGSTOP", "WB", "NB", "SB", "EB" };
 
     static int noNodes;
     Node root;
@@ -50,20 +51,73 @@ public class TST<T> {
                 BusStop currentStop = allBusStops.get(i);
                 if (currentStop != null) { //redundant
                     String name = currentStop.stop_name;
-                    System.out.println(currentStop.stop_id +  " Added stop " + name );
+                    name = adjustName(name);
+                   //System.out.println(currentStop.stop_id +  " Added stop " + name );
                     put(name, currentStop);
                 }
             }
         }
     }
 
+    public String removeKeyWords(String name)
+    {
+        String adjustedName = "";
+        String[] wordsInStopName = name.split(" ");
+        boolean includeSpace = false;
+        for(int i = 0; i < wordsInStopName.length; i++)
+        {
+            if(includeSpace)
+            {
+                adjustedName += " ";
+            }
+            if(!Arrays.asList(KEYWORDS).contains(wordsInStopName[i])) {
+                //send to the back
+                adjustedName += wordsInStopName[i];
+                includeSpace = true;
+            }
+        }
+        return adjustedName;
+    }
+
+
+    public String adjustName(String name)
+    {
+        String adjustedName = "";
+        String[] wordsInStopName = name.split(" ");
+        for(int i = 0; i < wordsInStopName.length; i++)
+        {
+            if(Arrays.asList(KEYWORDS).contains(wordsInStopName[i])) {
+                //send to the back
+                String keyword = wordsInStopName[i];
+                int j = i;
+                while (j < wordsInStopName.length-1) {
+                    wordsInStopName[j] = wordsInStopName[j + 1];
+                    j++;
+                }
+                wordsInStopName[wordsInStopName.length - 1] = keyword;
+            }
+        }
+        for(int i = 0; i < wordsInStopName.length; i++)
+        {
+            adjustedName += wordsInStopName[i];
+            if(i != wordsInStopName.length - 1)
+            {
+                adjustedName += " ";
+            }
+        }
+        //System.out.println(adjustedName);
+        return adjustedName;
+    }
+
     public ArrayList<BusStop> contains(String key) {
+        //String adjustedKey = removeKeyWords(key);
+        String adjustedKey = adjustName(key);
         if (key == null) {
             throw new IllegalArgumentException("argument to contains() is null");
         }
-        if (get(key) != null)
+        if (get(adjustedKey) != null)
         {
-            return get(key);
+            return get(adjustedKey);
         }
         return null;
     }
@@ -79,9 +133,9 @@ public class TST<T> {
         possibleValues = new ArrayList<>();
         //searchResults = new HashSet<>();
         //searchResults.add(root.value);
-        //findChildVals(root.middle);
         if (x.value != null) possibleValues.add((x.value));
         findChildVals(x);
+        //findChildVals(x);
 
         return possibleValues;
         //return searchResults;
@@ -90,10 +144,10 @@ public class TST<T> {
     private Node get(Node x, String key, int d) {
         if (x == null) return null;
         if (key.length() == 0) throw new IllegalArgumentException("key must have length >= 1");
-        //if(d == key.length()-1)
-        //{
-          //  return x;
-        //}
+        if(x.isEnd)
+        {
+          return x;
+        }
         char c = key.charAt(d);
         if (c < x.c) return get(x.left, key, d);
         else if (c > x.c) return get(x.right, key, d);
@@ -133,7 +187,9 @@ public class TST<T> {
         if (c < x.c) x.left = put(x.left, key, val, d);
         else if (c > x.c) x.right = put(x.right, key, val, d);
         else if (d < key.length() - 1) x.middle = put(x.middle, key, val, d + 1);
-        else x.value = val;
+        else{
+            x.value = val;
+            x.isEnd = true;}
         return x;
     }
 
