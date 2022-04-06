@@ -57,6 +57,7 @@ public class TST<T> {
                 }
             }
         }
+        possibleValues = new ArrayList<>();
     }
 
     public String removeKeyWords(String name)
@@ -216,12 +217,18 @@ public class TST<T> {
     }
      */
 
-    public void printPossibleValues()
+    public boolean printPossibleValues()
     {
         for(int i = 0; i < possibleValues.size(); i++)
         {
             possibleValues.get(i).tellMeAboutThisBusStop();
         }
+        if(possibleValues.size() == 0)
+        {
+            System.out.println("There are no bus stops that match this name. Please try again");
+            return false;
+        }
+        return true;
     }
 
 }

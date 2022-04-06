@@ -13,7 +13,7 @@ public class Time {
     Time GetTimeFromString(String time)
     {
         time = time.substring(1);
-        //this line makes sure that we skip the space after the comma, otherwise the next line wont work
+        // ^ this line makes sure that we skip the space after the comma, otherwise the next line wont work
         String[] split = time.split(":");
         int hours = Integer.parseInt(split[0]);
         int minutes = Integer.parseInt(split[1]);

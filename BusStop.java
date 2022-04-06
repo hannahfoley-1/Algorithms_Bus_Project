@@ -57,5 +57,7 @@ public class BusStop {
         {
             System.out.println("Stop name : " + stop_name + '\n' + "Stop id : " + stop_id + '\n' + "Stop co-orddinates : ("
                     + stop_lat + ", " + stop_lon + ")" + '\n');
+            System.out.println("//////////////////////////////////////////////");
+
         }
 }

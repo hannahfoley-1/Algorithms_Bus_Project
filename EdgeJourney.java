@@ -2,13 +2,9 @@ import java.util.ArrayList;
 
 public class EdgeJourney {
     int from_stop_id;
-    //BusStop from_stop;
     int to_stop_id;
-    //BusStop to_stop;
-    //Time time;
     int transfer_type;
-    ArrayList<Integer> journey_ids = new ArrayList<>();
-    //weight here is cost
+    //ArrayList<Integer> journey_ids = new ArrayList<>();
     double edgeWeight;
     double distance = -1;
 
@@ -21,7 +17,7 @@ public class EdgeJourney {
         this.edgeWeight = weight;
     }
 
-    public void addJourneyID(int journeyID)
+    /*public void addJourneyID(int journeyID)
     {
         journey_ids.add(journeyID);
     }
@@ -32,10 +28,11 @@ public class EdgeJourney {
     }
      */
 
-    public double getEdgeWeight()
+    /*public double getEdgeWeight()
     {
         return edgeWeight;
     }
+     */
 
     public void addDistance(double distance)
     {

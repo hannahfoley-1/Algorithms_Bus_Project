@@ -5,12 +5,12 @@ import java.util.*;
 
 public class EdgeWeightedGraph {
     public int noVertices;
-    //public ArrayList<BusStop> allBusStops;
     HashMap<Integer, BusStop> allBusStops;
-    //public ArrayList<Trip> allTrips;
     HashMap<Integer, Trip> allTrips;
     HashMap<Integer, ArrayList<EdgeJourney>> adjacencyList;
     Time timeClass = new Time(0, 0, 0);
+
+    //these are used to traverse through the allBusStops HashMap and allTrips HashMap
     int minStopNo = Integer.MAX_VALUE;
     int maxStopNo = Integer.MIN_VALUE;
     int minTripNo = Integer.MAX_VALUE;
@@ -26,9 +26,9 @@ public class EdgeWeightedGraph {
 
     }
 
+    //fill up the list of all the bus stops
     private void fillUpStops(String stopsFile) {
-        boolean valid;
-        //fill up the list of all the bus stops
+        boolean valid = true;
         if (stopsFile == null || stopsFile == "") {
             valid = false;
         }
@@ -40,13 +40,12 @@ public class EdgeWeightedGraph {
             line = reader.readLine();
 
             int count = 0;
-            while (line != null) {
-                System.out.println(count);
-                count++;
-                System.out.println(count);
+            while (line != null && valid) {
                 Scanner scanner = new Scanner(line);
                 scanner.useDelimiter(",");
                 int stop_id = scanner.nextInt();
+
+                //change the min and max stop ID if needs be
                 if(stop_id < minStopNo)
                 {
                     minStopNo = stop_id;
@@ -55,15 +54,22 @@ public class EdgeWeightedGraph {
                 {
                     maxStopNo = stop_id;
                 }
+
                 //skipping irrelevant info
                 scanner.next();
+
                 String stop_name = scanner.next();
-                //skipping irrelevant info (i hope)
+
+                //skipping irrelevant info
                 scanner.next();
+
                 double stop_lat = scanner.nextDouble();
                 double stop_lon = scanner.nextDouble();
+
+                //make new bus stop and add to HashMap
                 BusStop currentStop = new BusStop(stop_id, stop_lat, stop_lon, stop_name);
                 allBusStops.put(stop_id, currentStop);
+
                 scanner.close();
                 line = reader.readLine();
             }
@@ -73,6 +79,7 @@ public class EdgeWeightedGraph {
         }
     }
 
+    //fill up the links between bus stops, from both the stops_times file and transfers file
     private void fillUpTrips(String stopsTimesFile, String transfersFile) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopsTimesFile));
@@ -100,11 +107,11 @@ public class EdgeWeightedGraph {
 
             int count = 0;
             while (line != null) {
-                System.out.println("Stopsfile: " + count);
-                count++;
                 scanner = new Scanner(line);
                 scanner.useDelimiter(",");
                 int trip_id_2 = scanner.nextInt();
+
+                //change the min and max trip number
                 if(trip_id_2 < minTripNo)
                 {
                     minTripNo = trip_id_2;
@@ -113,6 +120,7 @@ public class EdgeWeightedGraph {
                 {
                     maxTripNo = trip_id_2;
                 }
+
                 if (working_trip_id == trip_id_2)
                 {
                     //they are still on the same route
@@ -126,6 +134,7 @@ public class EdgeWeightedGraph {
                 } else {
                     //we are working with a new trip so add the previous trip to the list of finished trips
                     allTrips.put(working_trip_id, currentTrip);
+                    System.out.println("Finished with trip id: " + working_trip_id);
                     //change working trip
                     working_trip_id = trip_id_2;
                     currentTrip = new Trip(working_trip_id);
@@ -145,7 +154,7 @@ public class EdgeWeightedGraph {
                 //skip over pick up type and drop of type
                 scanner.next();
                 scanner.next();
-                //skip over distance travelled for the min
+                //skip over distance travelled for the minute
                 double dist_travelled = 0;
                 if(scanner.hasNext())
                 {
@@ -179,6 +188,7 @@ public class EdgeWeightedGraph {
                             exists = true;
                         }
                     }
+                    //if the link between these two bus stops doesn't already exits, add it onto adjacency list
                     if(!exists)
                     {
                         journeys.add(edge);
@@ -192,7 +202,7 @@ public class EdgeWeightedGraph {
             //add the final trip we were working on
             allTrips.put(working_trip_id, currentTrip);
         } catch (Exception e) {
-            System.out.println("Error");
+            System.out.println("Error in fillinf up trips ");
         }
 
         try {
@@ -202,8 +212,6 @@ public class EdgeWeightedGraph {
 
             int count = 0;
             while (line != null) {
-                System.out.println("Transfersfile: " + count);
-                count++;
                 Scanner scanner = new Scanner(line);
                 scanner.useDelimiter(",");
 
@@ -251,17 +259,19 @@ public class EdgeWeightedGraph {
                 scanner.close();
             }
         } catch (Exception e) {
-            System.out.println("Error");
+            System.out.println("Error in filling up transfers");
         }
     }
 
+    //finds the shortest path between two bus stops, printing out the stops between and the cost of the trip
     public void ShortestPath(int start, int end) {
         HashMap<Integer, Boolean> visited = new HashMap<>();
         HashMap<Integer, Integer> proceedingStop = new HashMap<>();
         HashMap<Integer, Double> distance = new HashMap<>();
 
+        //initialise the HashMaps
         for (int i = minStopNo; i <= maxStopNo; i++) {
-            if(allBusStops.get(i) != null)
+            if(doesThisBusStopExist(i))
             {
                 int currentStopID = allBusStops.get(i).stop_id;
                 visited.put(currentStopID, false);
@@ -269,8 +279,10 @@ public class EdgeWeightedGraph {
                 distance.put(currentStopID, Double.POSITIVE_INFINITY);
             }
         }
+        //distance from the start to itself is 0
         distance.put(start, 0.0);
 
+        //make a new priority queue, the comparator will be the edgeWeight of the journey
         PriorityQueue<EdgeJourney> queue = new PriorityQueue<EdgeJourney>(noVertices, new Comparator<EdgeJourney>() {
             @Override
             public int compare(EdgeJourney o1, EdgeJourney o2) {
@@ -283,6 +295,7 @@ public class EdgeWeightedGraph {
             }
         });
 
+        //add all the edges from the first node into the PQ
         int from = start;
         ArrayList<EdgeJourney> edges = adjacencyList.get(from);
         for (int i = 0; edges != null && i < edges.size(); i++) {
@@ -322,28 +335,31 @@ public class EdgeWeightedGraph {
                     }
                 }
             }
-            //if (to == end) {
+            //the way dijkstra works is each node is only visited once, so if we've visited our destination node we
+            //will not be visiting it again. This means we can stop the shortest paths search here to save time.
             if (visited.get(end)) {
                 solved = true;
                 System.out.println("The stops between stop #" + start + " (" + allBusStops.get(start).stop_name + ") " +
                         "and stop #" + end + " (" + allBusStops.get(end).stop_name + ") are: ");
-                //reverse proceeding stop list
+
                 if(proceedingStop.size() == 1)
                 {
                     System.out.println("These are 1 stop apart");
                     System.out.println("//////////////////////");
                 }
+
                 else
                 {
-                    //print stops in correct order
+                    //get stop sequence
                     ArrayList<Integer> stopSequence = new ArrayList<>();
                     int first = start;
                     int last = end;
-                    while (allBusStops.get(last) != null && last != first) {
+                    while (doesThisBusStopExist(last) && last != first) {
                         stopSequence.add(allBusStops.get(last).stop_id);
                         last = proceedingStop.get(last);
                     }
                     stopSequence.add(allBusStops.get(first).stop_id);
+                    //print in correct order
                     for(int i = stopSequence.size()-1; i >= 0; i--)
                     {
                         if(i != stopSequence.size()-1)
@@ -353,90 +369,63 @@ public class EdgeWeightedGraph {
                         System.out.println(stopSequence.get(i) + " (" + allBusStops.get(stopSequence.get(i)).stop_name + ")");
 
                     }
-                    /*
-                    int first = 0;
-                            //= start;
-                    //int last = end;
-                    int last = start;
-                    while (allBusStops.get(last) != null && last != first) {
-                        //first != last &&
-                        //&& last != end
-                        if(last != end)
-                        {
-                            System.out.println("->");
-                        }
-                        System.out.println(last + " (" + allBusStops.get(last).stop_name + ")");
-                        last = proceedingStop.get(last);
-                        if(last == first)
-                        {
-                            System.out.println("->");
-                            System.out.println(last + " (" + allBusStops.get(last).stop_name + ")");
-                        }
-                    }
-                     */
+
                     System.out.println("The cost of this trip is " + distance.get(end));
                     System.out.println("//////////////////////////////////////////////");
-
                 }
             }
-
         }
+
         if(!solved)
         {
             System.out.println("There doesn't seem to be a way to connect these two stops. Please try again.");
         }
-
-        /*
-    private double calcHueristic(int start, int end)
-    {
-        BusStop busStop1 = allBusStops.get(start);
-        double lat1 = busStop1.stop_lat;
-        double lon1 = busStop1.stop_lon;
-        BusStop busStop2 = allBusStops.get(end);
-        double lat2 = busStop2.stop_lat;
-        double lon2 = busStop2.stop_lon;
-        final int radius = 6271;
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = radius * c * 1000; // convert to meters
-
-        distance = Math.pow(distance, 2);
-
-        return Math.sqrt(distance);
     }
-*/
 
-    }
-    void getBussesArrivingAt(Time time)
+    //prints all the busses arriving at a given time (stop no and trip id no)
+    boolean getBussesArrivingAt(Time time)
     {
         boolean somethingPrinted = false;
-        for(int i = minTripNo; i <= maxTripNo && allTrips.get(i) != null; i++)
+        //traverse through all trips, if the trip has an arrival time the same as the one given, print out the info
+        for(int i = minTripNo; i <= maxTripNo; i++)
         {
-            Trip currentTrip = allTrips.get(i);
-            //currentTrip.sortArrivalTimeArray();
-            if(currentTrip.getStopForArrivalTime(time) != -1)
-            //sort the arrival time array
-            //currentTrip.arrival_times.sort(Comparator<Time>);
-            //check if the time is in this array
-            //if(currentTrip.arrival_times.contains(time))
+            if(doesThisTripExist(i))
             {
-                somethingPrinted = true;
-                System.out.println("Stop No: " + currentTrip.getStopForArrivalTime(time) + " Trip ID: " + currentTrip.trip_id);
+                Trip currentTrip = allTrips.get(i);
+                if(currentTrip.getStopForArrivalTime(time) != -1)
+                {
+                    somethingPrinted = true;
+                    System.out.println("Stop No: " + currentTrip.getStopForArrivalTime(time) + " Trip ID: " + currentTrip.trip_id);
+                }
             }
         }
+        //if there were never any arrival times found that match search critieria
         if(!somethingPrinted)
         {
             System.out.println("There are no buses arriving at this time. Maybe try and enter another time. ");
+            return false;
+        }
+        else
+        {
+            System.out.println("//////////////////////////////////////////////");
+            return true;
         }
     }
 
+    //checks if the bus stop id is valid
     boolean doesThisBusStopExist(int stop_id)
     {
         if(allBusStops.get(stop_id) != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    //checks if the journey ID is valid
+    boolean doesThisTripExist(int journey_id)
+    {
+        if(allTrips.get(journey_id) != null)
         {
             return true;
         }

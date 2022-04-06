@@ -14,10 +14,10 @@ public class VancouverBusSystem {
 
     public static void main(String[] args) {
         {
-            System.out.println("Begin");
+            System.out.println("Loading Data");
             try {
                 //transfersGraph = new Graph("transfers.txt", "stops.txt", "stop_times.txt");
-                graph = new EdgeWeightedGraph("stops.txt", "stop_times_small.txt", "transfers.txt");
+                graph = new EdgeWeightedGraph("stops.txt", "stop_times.txt", "transfers.txt");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -155,14 +155,20 @@ public class VancouverBusSystem {
 
     public static void information_option()
     {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the name of the bus stop or the first few letters ");
-        String input;
-        input = scanner.nextLine();
-        input = input.toUpperCase(Locale.ROOT);
-        TST tst = new TST(graph);
-        ArrayList<String> matches = tst.contains(input);
-        tst.printPossibleValues();
+        boolean printed = false;
+
+        while(!printed)
+        {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the name of the bus stop or the first few letters ");
+            String input;
+            input = scanner.nextLine();
+            input = input.toUpperCase(Locale.ROOT);
+            TST tst = new TST(graph);
+            ArrayList<String> matches = tst.contains(input);
+            printed = tst.printPossibleValues();
+        }
+
 
         /*
         if(stopsWithPrefix != null)
@@ -183,21 +189,38 @@ public class VancouverBusSystem {
 
     public static void arrival_time_option()
     {
+        boolean valid_input = false;
         Scanner scanny = new Scanner(System.in);
         String input;
-        System.out.print("Enter arrival time in hh:mm:ss ");
-        input = scanny.next();
-        Scanner scanner = new Scanner(input);
-        scanner.useDelimiter(":");
-        int hours = scanner.nextInt();
-        int minutes = scanner.nextInt();
-        int seconds = 0;
-        if(scanner.hasNextInt())
+
+        while(!valid_input)
         {
-            seconds = scanner.nextInt();
+            System.out.print("Enter arrival time in hh:mm:ss ");
+            input = scanny.next();
+            Scanner scanner = new Scanner(input);
+            scanner.useDelimiter(":");
+            int hours = scanner.nextInt();
+            int minutes = scanner.nextInt();
+            int seconds = 0;
+            if(scanner.hasNextInt())
+            {
+                seconds = scanner.nextInt();
+            }
+            if(hours > 23 || minutes > 59 || seconds > 59 || hours < 0 || minutes < 0 || seconds < 0)
+            {
+                System.out.println("Time entered is invalid");
+            }
+            else
+            {
+                valid_input = true;
+                Time time = new Time(hours, minutes, seconds);
+                if (!graph.getBussesArrivingAt(time))
+                {
+                    valid_input = false;
+                }
+            }
         }
-        Time time = new Time(hours, minutes, seconds);
-        graph.getBussesArrivingAt(time);
+
         /*
         ArrayList<Trip> allTrips = graph.allTrips;
         for(int i = 0; i < allTrips.size(); i++)
