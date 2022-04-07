@@ -24,56 +24,63 @@ public class Trip {
     //does this by searching through arrayList using binary search
     int getStopForArrivalTime(Time time)
     {
-        int low = 0;
-        int high = arrival_times.size()-1;
-        while(low < high)
+        if(time != null)
         {
-            int mid = low + (high-low) / 2;
-            if(time.hour < arrival_times.get(mid).hour)
+            int low = 0;
+            int high = arrival_times.size()-1;
+            while(low < high)
             {
-                high = mid - 1;
-            }
-            else if (time.hour > arrival_times.get(mid).hour)
-            {
-                low = mid + 1;
-            }
-            else
-            {
-                //now compare minutes
-                if(time.minute < arrival_times.get(mid).minute)
+                int mid = low + (high-low) / 2;
+                if(mid >= arrival_times.size() || arrival_times.get(mid) == null)
+                {
+                    return -1;
+                }
+                if(time.hour < arrival_times.get(mid).hour)
                 {
                     high = mid - 1;
                 }
-                else if (time.minute > arrival_times.get(mid).minute)
+                else if (time.hour > arrival_times.get(mid).hour)
                 {
                     low = mid + 1;
                 }
                 else
                 {
-                    //now compare seconds
-                    if(time.second < arrival_times.get(mid).second)
+                    //now compare minutes
+                    if(time.minute < arrival_times.get(mid).minute)
                     {
                         high = mid - 1;
                     }
-                    else if (time.second > arrival_times.get(mid).second)
+                    else if (time.minute > arrival_times.get(mid).minute)
                     {
                         low = mid + 1;
                     }
                     else
                     {
-                        return stop_sequence.get(mid);
+                        //now compare seconds
+                        if(time.second < arrival_times.get(mid).second)
+                        {
+                            high = mid - 1;
+                        }
+                        else if (time.second > arrival_times.get(mid).second)
+                        {
+                            low = mid + 1;
+                        }
+                        else
+                        {
+                            return stop_sequence.get(mid);
+                        }
                     }
                 }
-            }
 
-        }
-        if(low == high)
-        {
-            //if they are the same, return the stop
-            Time couldBe = arrival_times.get(low);
-            if(couldBe.minute == time.minute && couldBe.hour == time.hour && couldBe.second == time.second)
+            }
+            if(low == high)
             {
-                return stop_sequence.get(low);
+                //if they are the same, return the stop
+                Time couldBe = arrival_times.get(low);
+                if(couldBe.minute == time.minute && couldBe.hour == time.hour && couldBe.second == time.second)
+                {
+                    return stop_sequence.get(low);
+                }
             }
         }
         return -1;

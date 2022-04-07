@@ -9,6 +9,7 @@ public class VancouverBusSystem {
     // public static BusStopsList allBusStops;
     //public static Graph transfersGraph;
     public static EdgeWeightedGraph graph;
+    public static Time time1 = new Time(0, 0, 0);
     //public static BusStopsSchedule schedule;
 
 
@@ -61,10 +62,10 @@ public class VancouverBusSystem {
 
     public static void shortest_path_option()
     {
-        Scanner scanner = new Scanner(System.in);
         int start_id = 0;
         int destination_id = 0;
         boolean validInput = false;
+        Scanner scanner = new Scanner(System.in);
 
         while(!validInput)
         {
@@ -79,7 +80,7 @@ public class VancouverBusSystem {
                 }
                 //else
                 //{
-                  //  validInput = true;
+                //  validInput = true;
                 //}
             }
             else
@@ -108,6 +109,53 @@ public class VancouverBusSystem {
                 System.out.println("Please enter bus stop ID number ");
             }
         }
+
+
+        /*
+        while(!validInput) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("What bus stop are you travelling from? ");
+            if (scanner.hasNextInt()) {
+                start_id = scanner.nextInt();
+                if (graph.doesThisBusStopExist(start_id) == false) {
+                    System.out.println("This bus stop ID does not exist... ");
+                    continue;
+                }
+                else
+                {
+                  validInput = true;
+                }
+            } else {
+                System.out.println("Please enter bus stop ID number ");
+                //continue;
+            }
+        }
+
+            //BusStop start = allBusStops.getBusStopByID(start_id);
+        validInput = false;
+        while(!validInput)
+        {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("What bus stop are you travelling to? ");
+            if(scanner.hasNextInt())
+            {
+                destination_id = scanner.nextInt();
+                if(graph.doesThisBusStopExist(destination_id) == false)
+                {
+                    System.out.println("This bus stop ID does not exist... ");
+                }
+                else
+                {
+                    validInput = true;
+                }
+            }
+            else
+            {
+                System.out.println("Please enter bus stop ID number ");
+            }
+        }
+
+         */
 
         graph.ShortestPath(start_id, destination_id);
 
@@ -166,6 +214,7 @@ public class VancouverBusSystem {
             input = input.toUpperCase(Locale.ROOT);
             TST tst = new TST(graph);
             ArrayList<String> matches = tst.contains(input);
+            //tst.printPossibleValues();
             printed = tst.printPossibleValues();
         }
 

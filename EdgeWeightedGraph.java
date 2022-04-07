@@ -134,7 +134,7 @@ public class EdgeWeightedGraph {
                 } else {
                     //we are working with a new trip so add the previous trip to the list of finished trips
                     allTrips.put(working_trip_id, currentTrip);
-                    System.out.println("Finished with trip id: " + working_trip_id);
+                    //System.out.println("Finished with trip id: " + working_trip_id);
                     //change working trip
                     working_trip_id = trip_id_2;
                     currentTrip = new Trip(working_trip_id);
